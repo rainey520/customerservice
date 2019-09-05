@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-iso-add">
+		<input type="hidden" id="parentId" name="parentId" th:value="${parentId}">
+		<div class="form-group">
+			<input type="hidden" id="iType" name="iType" value="0">
+			<label class="col-sm-3 control-label">文件夹名称：</label>
+			<div class="col-sm-8">
+				<input id="cName" name="cName" class="form-control" type="text">
+			</div>
+		</div>
+	</form>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    var prefix = ctx + "iso/iso"
+    $("#form-iso-add").validate({
+        rules:{
+            xxxx:{
+                required:true,
+            },
+        }
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+			var cName = $.common.trim($("#cName").val());
+			if (cName.indexOf(".")!= -1) {
+				$.modal.alertWarning("名称不能有小数点");
+				return;
+			}
+            $.operate.save(prefix + "/add", $('#form-iso-add').serialize());
+        }
+    }
+</script>
+</body>
+</html>

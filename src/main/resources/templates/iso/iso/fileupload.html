@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link th:href="@{/ajax/libs/fileinput/fileinput.css}" rel="stylesheet"/>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form id="add-file-form" enctype="multipart/form-data">
+            <input type="hidden" id="parentId" name="parentId" th:value="${parentId}">
+            <div class="form-group">
+                <label class="font-noraml">文件上传</label>
+                <div>
+                    <input class="file-loading" id="fileinput" name="file" type="file" multiple>
+                </div>
+            </div>
+        </form>
+    </div>
+<div th:include="include::footer"></div>
+<script th:src="@{/ajax/libs/fileinput/fileinput.js}"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#fileinput").fileinput({
+            // 'theme': 'explorer-fas',
+            showUpload : true, //显示整体上传的按钮
+            showRemove : true,// 显示整体删除的按钮
+            uploadAsync: true,//默认异步上传
+            uploadUrl: '/iso/iso/uploadSop',
+            overwriteInitial: false,
+            dropZoneEnabled: false,//是否显示拖拽区域
+            maxFileCount: 6, //表示允许同时上传的最大文件个数
+            initialPreviewAsData: true,
+            showBrowse: true,
+            showCaption: true,//是否显示标题
+            uploadExtraData:function(previewId, index) {   //获取额外的参数
+                var obj = {
+                    parentId:$("#parentId").val(),
+                };
+                return obj;
+            }
+        }).on("fileuploaded", function(event, data, previewId, index) {
+            var code = data.response.code;
+            var msg = data.response.msg;
+            if (code == web_status.FAIL) {
+                $.modal.alertError(msg);
+            } else {
+                $.modal.confirm("上传成功",function () {
+                    submitHandler();
+                })
+            }
+        });
+    });
+
+    function submitHandler() {
+        var fileLength = $(".file-upload-indicator").length;
+        var sum = 0;
+        $(".file-upload-indicator").each(function () {
+            if ($(this).attr("title") == '上传') {
+                sum++;
+            }
+        })
+        if (fileLength != sum) {
+            $.modal.alertError("还有文件未上传，请点击上传");
+            return;
+        }
+        $.modal.close();
+        window.parent.$.table.refresh();
+    }
+
+</script>
+</body>
+</html>

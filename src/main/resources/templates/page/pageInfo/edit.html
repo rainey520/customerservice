@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link th:href="@{/ajax/libs/cropbox/cropbox.css}" rel="stylesheet"/>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+	<div class="row">
+		<div class="col-sm-4">
+			<div class="ibox float-e-margins">
+				<div class="ibox-title">
+					<h5>基本数据</h5>
+				</div>
+				<div class="ibox-content">
+					<div class="panel-body">
+						<div class="panel-group" id="accordion1">
+							<form role="form" id="form-page-add" th:object="${pageInfo}">
+								<input name="id" id="id" type="hidden"  th:field="*{id}" />
+								<input name="imgPath" id="imgPath" type="hidden"  th:field="*{imgPath}" />
+								<div class="form-group">
+									<label class="col-sm-12 control-label">页面名称</label>
+									<div class="col-sm-12">
+										<input type="text" name="pageName" th:field="*{pageName}" placeholder="请输入页面名称" class="form-control">
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-12 control-label">布局类型</label>
+									<div class="col-sm-12">
+										<select id="layout_type" th:with="layout =${@layout.selectLayoutAll(0)}" class="form-control m-b" name="pageLayoutType">
+											<option th:each="dict : ${layout}" th:text="${dict.layout_name}" th:field="*{pageLayoutType}"  th:layout-type="${dict.layout_type}" th:value="${dict.id}"></option>
+										</select>
+									</div>
+								</div>
+								<div>
+									<div class="text-center">
+										<p><img width="120" id="add_page_back_url" height="120" th:src="${#strings.isEmpty(pageInfo.pageBackImg)?'/js/bk.jpg':pageInfo.pageBackImg}"></p>
+										<p><a href="javascript:pageBack()">背景图片</a></p>
+									</div>
+								</div>
+								<div>
+									<a onclick="submitHandler()"  class="btn btn-primary btn-rounded btn-block" >
+										<i class="fa fa-save"></i> 保存
+									</a>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-8">
+			<div class="ibox float-e-margins">
+				<div class="ibox-title">
+					<h5 id="layout_title"></h5>
+				</div>
+				<div class="ibox-content">
+					<div class="panel-body">
+						<div class="panel-group" id="accordion">
+							<!--详情页面-->
+							<div id="detail_pane" th:with="layout =${@layout.selectLayoutAll(0)}">
+								<div th:data-detail="${lay.id}" th:each="lay : ${layout}"  >
+									<div class="col-sm-12" th:if="${lay.layout_type == 1}">
+										<div th:if="${lines == null}" class="col-sm-6">
+											<h4 style="color: red">请建立产线...</h4>
+										</div>
+										<div  class="panel panel-primary" th:if="${lines != null}">
+											<div class="panel-heading">
+												<span>请选择相关产线</span>
+											</div>
+											<div class="panel-body">
+												<div class="form-group">
+													<div data-checke-info class="col-sm-12">
+														<label class="checkbox-inline" th:if="${pageInfo.pageType == 1}" th:data-line-id="${item.id}"  th:each="item : ${lines}">
+															<input type="checkbox" onchange="hzCheck(this)" th:checked="${item.manual == 1 ?true:false}" th:value="${item.id}" style="width: 20px;height: 20px" ><span style="line-height: 25px;margin-left: 10px;" th:text="${item.lineName}"></span>
+														</label>
+														<label class="checkbox-inline" th:if="${pageInfo.pageType != 1}" th:data-line-id="${item.id}"  th:each="item : ${lines}" >
+															<input type="checkbox" onchange="hzCheck(this)" th:value="${item.id}"   style="width: 20px;height: 20px" ><span style="line-height: 25px;margin-left: 10px;" th:text="${item.lineName}"></span>
+														</label>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="col-sm-12" th:if="${lay.layout_type == 2}">
+										<div th:if="${lines == null}" class="col-sm-6">
+											<h4 style="color: red">请建立产线...</h4>
+										</div>
+										<div  class="panel panel-primary" th:if="${lines != null}">
+											<div class="panel-heading">
+												<span>请选择相关产线</span>
+											</div>
+											<div class="panel-body">
+												<div class="form-group">
+													<div data-checke-info class="col-sm-12">
+														<label class="checkbox-inline" th:if="${pageInfo.pageType == 2}" th:data-line-id="${item.id}"  th:each="item : ${lines}">
+															<input type="radio" name="line" th:checked="${item.manual == 1 ?true:false}" th:value="${item.id}"   style="width: 20px;height: 20px" ><span style="line-height: 25px;margin-left: 10px;"  th:text="${item.lineName}"></span>
+														</label>
+														<label class="checkbox-inline" th:if="${pageInfo.pageType != 2}" th:data-line-id="${item.id}"  th:each="item : ${lines}">
+															<input type="radio" name="line"  th:value="${item.id}"  style="width: 20px;height: 20px" ><span style="line-height: 25px;margin-left: 10px;"  th:text="${item.lineName}"></span>
+														</label>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="col-sm-12" th:if="${lay.layout_type == 3}">
+										<div th:if="${#lists.isEmpty(singles)}" class="col-sm-6">
+											<h4 style="color: red">请建立车间...</h4>
+										</div>
+										<div class="panel panel-primary" th:if="${not #lists.isEmpty(singles)}">
+											<div class="panel-heading">
+												<span>请选择相关车间</span>
+											</div>
+											<div class="panel-body">
+												<div class="form-group">
+													<div data-checke-info class="col-sm-12">
+														<label class="checkbox-inline" th:data-line-id="${item.id}"
+															   th:each="item,start:${singles}">
+															<input type="radio" name="line"
+																   th:checked="${item.parentId == 1?true:false}"
+																   style="width: 20px;height: 20px"><span
+																style="line-height: 25px;margin-left: 10px;"
+																th:utext="${item.workshopName}"></span>
+														</label>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="container" id="add_page_back" style="display: none;">
+	<div class="imageBox">
+		<div class="thumbBox"></div>
+		<div class="spinner" style="display: none">Loading...</div>
+	</div>
+	<div class="action">
+		<div class="new-contentarea tc">
+			<a href="javascript:void(0)" class="upload-img"> <label for="avatar">上传图像</label> </a>
+			<input type="file" class="" name="avatar" id="avatar" accept="image/*"/>
+		</div>
+		<input type="button" id="btnCrop" class="Btnsty_peyton" value="裁切" />
+		<input type="button" id="btnZoomIn" class="Btnsty_peyton" value="+" />
+		<input type="button" id="btnZoomOut" class="Btnsty_peyton" value="-" />
+	</div>
+	<div class="cropped"></div>
+</div>
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+
+<!-- bootstrap-table 表格插件 -->
+<script th:src="@{/ajax/libs/bootstrap-table/bootstrap-table.min.js}"></script>
+<script th:src="@{/ajax/libs/bootstrap-table/locale/bootstrap-table-zh-CN.min.js}"></script>
+<script th:src="@{/ajax/libs/bootstrap-table/extensions/mobile/bootstrap-table-mobile.js}"></script>
+<script th:src="@{/ajax/libs/bootstrap-table/extensions/toolbar/bootstrap-table-toolbar.min.js}"></script>
+<script th:src="@{/ajax/libs/bootstrap-table/extensions/columns/bootstrap-table-fixed-columns.js}"></script>
+<!-- jquery-validate 表单验证插件 -->
+<script th:src="@{/ajax/libs/validate/jquery.validate.min.js}"></script>
+<script th:src="@{/ajax/libs/validate/messages_zh.min.js}"></script>
+<script th:src="@{/ajax/libs/validate/jquery.validate.extend.js}"></script>
+<!-- jquery-validate 表单树插件 -->
+<script th:src="@{/ajax/libs/bootstrap-treetable/bootstrap-treetable.js}"></script>
+<!-- jquery-export 表格导出插件 -->
+<script th:src="@{/ajax/libs/bootstrap-table/extensions/export/bootstrap-table-export.js}"></script>
+<script th:src="@{/ajax/libs/bootstrap-table/extensions/export/tableExport.js}"></script>
+<!-- 遮罩层 -->
+<script th:src="@{/ajax/libs/blockUI/jquery.blockUI.js}"></script>
+<script th:src="@{/ajax/libs/iCheck/icheck.min.js}"></script>
+<script th:src="@{/ajax/libs/layer/layer.min.js}"></script>
+<script th:src="@{/ajax/libs/layui/layui.js}"></script>
+<script th:src="@{/ruoyi/js/common.js?v=3.2.0}"></script>
+<script th:src="@{/ruoyi/js/ry-ui.js?v=3.2.0}"></script>
+<script th:inline="javascript"> var ctx = [[@{/}]]; </script>
+<script th:src="@{/ajax/libs/cropbox/cropbox.js}"></script>
+<script type="text/javascript">
+	var cropper;
+	$(window).load(function() {
+		var avatar = '';
+		var options = {
+			thumbBox: '.thumbBox',
+			spinner: '.spinner',
+			imgSrc: $.common.isEmpty(avatar) ? ctx + 'img/profile.jpg' : avatar
+		}
+		cropper = $('.imageBox').cropbox(options);
+		$('#avatar').on('change', function() {
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				options.imgSrc = e.target.result;
+				//根据MIME判断上传的文件是不是图片类型
+				if((options.imgSrc).indexOf("image/")==-1){
+					$.modal.alertWarning("文件格式错误，请上传图片类型,如：JPG,JPEG，PNG后缀的文件。");
+				} else {
+					cropper = $('.imageBox').cropbox(options);
+				}
+			}
+			reader.readAsDataURL(this.files[0]);
+		})
+
+		$('#btnCrop').on('click', function(){
+			var img = cropper.getDataURL();
+			$('.cropped').html('');
+			$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:64px;margin-top:4px;border-radius:64px;box-shadow:0px 0px 12px #7E7E7E;" ><p>64px*64px</p>');
+			$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:128px;margin-top:4px;border-radius:128px;box-shadow:0px 0px 12px #7E7E7E;"><p>128px*128px</p>');
+			$('.cropped').append('<img src="'+img+'" align="absmiddle" style="width:180px;margin-top:4px;border-radius:180px;box-shadow:0px 0px 12px #7E7E7E;"><p>180px*180px</p>');
+		})
+
+		$('#btnZoomIn').on('click', function(){
+			cropper.zoomIn();
+		})
+
+		$('#btnZoomOut').on('click', function(){
+			cropper.zoomOut();
+		})
+	});
+
+	function saveBack(index) {
+		var img = cropper.getBlob();
+		var formdata = new FormData();
+		formdata.append("backFile", img);
+		$.ajax({
+			url: ctx + "page/pageInfo/savePageBack",
+			data: formdata,
+			type: "post",
+			processData: false,
+			contentType: false,
+			success: function(result) {
+				if(result.msg){
+					// $("#add_page_back_url").attr('src',result.msg)
+					$("#add_page_back_url").attr('src', result.data.imgUrl);
+					$("#imgPath").val(result.data.imgPath);
+				}
+				layer.close(index);
+			}
+		})
+	}
+</script>
+<script>
+	$(function () {
+		var i = $("#layout_type option:selected").val();
+		var text = $("#layout_type option:selected").text();
+		$("#layout_title").text(text);
+		$("#detail_pane").find("div[data-detail]").hide();
+		$("#detail_pane").find("div[data-detail="+i+"]").show();
+		$("#layout_type").change(function (e) {
+			var id = $(this).val();
+			$("#detail_pane").find("div[data-detail]").hide();
+			$("#detail_pane").find("div[data-detail="+id+"]").show();
+			var t =  $("#layout_type option:selected").text();
+			$("#layout_title").text(t);
+		})
+	})
+
+	/** 数据提交与验证 */
+	$("#form-page-add").validate({
+		rules: {
+			pageName: {
+				required: true,
+				remote: {
+					url: ctx + "page/pageInfo/checkPageName",
+					type: "post",
+					dataType: "json",
+					data: {
+						name : function() {
+							return $.common.trim($("#pageName").val());
+						},
+						id : function() {
+							return $.common.trim($("#id").val());
+						}
+					},
+					dataFilter: function(data, type) {
+						return $.validate.unique(data);
+					}
+				}
+			},
+		},
+		messages: {
+			pageName: {
+				required: "请输入看板名称",
+				remote:"看板名称已存在",
+			},
+		}
+	});
+	function submitHandler() {
+		if ($.validate.form()) {
+			edit();
+		}
+	}
+	function edit() {
+		var id = $("input[name='id']").val();
+		var imgPath = $("#imgPath").val();
+		var pageName = $("input[name='pageName']").val();
+		var layout_type = $("#layout_type").find("option:selected");
+		var pageType = $(layout_type).attr("layout-type");
+		var layout = $(layout_type).val();
+		var pageBackImg = $("#add_page_back_url").attr('src');
+		var data ={
+			id:id,
+			pageName:pageName,
+			pageType:pageType,
+			pageLayoutType:layout,
+			pageBackImg:pageBackImg,
+			imgPath:imgPath
+		}
+		switch (pageType) {
+			case "1"://宫格布局
+				data.configs = lattice(layout);
+				break;
+			case "2"://轮播布局
+				data.configs = roll(layout);
+				break;
+			case "3"://轮播布局
+				data.configs = roll(layout);
+				break;
+		}
+		$.ajax({
+			cache : true,
+			type : "POST",
+			url : ctx + "page/pageInfo/editSave",
+			data : JSON.stringify(data),
+			contentType: "application/json",
+			async : false,
+			error : function(request) {
+				$.modal.alertError("系统错误");
+			},
+			success : function(data) {
+				layer.msg("保存成功,正在刷新数据请稍后……", {
+							icon: $.modal.icon(modal_status.SUCCESS),
+							time: 500,
+							shade: [0.1, '#8F8F8F']
+						},
+						function () {
+						});
+			}
+		});
+	}
+
+	/**
+	 * 产线汇总
+	 */
+	function lattice(layout) {
+		var rows = [];
+		$("#detail_pane").find("div[data-detail='" + layout + "']").find("div[class='panel-body']")
+				.find("label[class='checkbox-inline']").each(function () {
+			var item = $(this).find("input[type='checkbox']");
+			if ($(item).is(':checked')) {
+				var row = {
+					lineId: $(this).attr("data-line-id")
+				};
+				rows.push(row);
+			}
+		});
+		return rows;
+	}
+
+	/**
+	 * 产线详情
+	 */
+	function roll(layout) {
+		var rows = [];
+		$("#detail_pane").find("div[data-detail='" + layout + "']").find("div[class='panel-body']")
+				.find("label[class='checkbox-inline']").each(function () {
+			var item = $(this).find("input[type='radio']");
+			if ($(item).is(':checked')) {
+				var row = {
+					lineId: $(this).attr("data-line-id")
+				};
+				rows.push(row);
+			}
+		});
+		return rows;
+	}
+
+
+	/**
+	 * 背景图片编辑
+	 */
+	function pageBack() {
+		layer.open({
+			type: 1,
+			area: ['800px', ($(window).height() - 50)+ 'px'],
+			fix: false,
+			//不固定
+			maxmin: true,
+			shade: 0.3,
+			title: "背景图片",
+			content: $("#add_page_back"),
+			btn: ['确定', '关闭'],
+			// 弹层外区域关闭
+			shadeClose: true,
+			yes: function (index, layero) {
+				saveBack(index);
+			},
+			cancel: function (index) {
+				return true;
+			}
+		});
+	}
+	/**
+	 * 产线汇总选择
+	 * @param val
+	 */
+	function hzCheck(val) {
+		//获取父元素
+		var size = $(val).parent("label").parent("div[data-checke-info]").find("input[type='checkbox']:checked").size();
+		if (size > 8) {
+			$.modal.alertWarning("最多只能选择8条产线");
+			$(val).attr("checked", false)
+		}
+	}
+</script>
+</body>
+</html>

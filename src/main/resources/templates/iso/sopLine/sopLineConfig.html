@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <input type="hidden" id="lineId" name="lineId" th:value="${line}"/>
+                <div class="select-list">
+                    <ul>
+                        <li>
+                          配置名称：
+                            <input type="text" name="cnfName">
+                        </li>
+                        <li>
+                            SOP：<select name="sopId" th:with="Company=${@devCompany.selectDevCompanyAll()}">
+                                    <option value="-1">请选择</option>
+                                    <option th:each="item : ${sops}"  th:text="${item.cName}" th:value="${item.isoId}"></option>
+                                </select>
+                        </li>
+                        <li>
+                            产品编码：<input type="text" name="pCode"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="add()" shiro:hasPermission="iso:sopLine:add">
+                <i class="fa fa-plus"></i> 添加
+            </a>
+            <a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="iso:sopLine:remove">
+                <i class="fa fa-remove"></i> 删除
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('iso:sopLine:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('iso:sopLine:remove')}]];
+    var prefix = ctx + "iso/sop";
+
+    $(function() {
+        var options = {
+            url: prefix + "/list",
+            createUrl: "/iso/sopLine/addConfig",
+            removeUrl: prefix + "/remove",
+            modalName: "SOP配置",
+            search: false,
+            showExport: true,
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field : 'id',
+                    title : '',
+                    visible: false
+                },
+                {
+                    field : 'cnfName',
+                    title : '配置名称',
+                    sortable: true,
+                },
+                {
+                    field : 'sopId',
+                    title : 'SOP',
+                    sortable: true,
+                    formatter:function (value, row, index) {
+                        return row.sopName;
+                    }
+                },
+                {
+                    field : 'pCode',
+                    title : '产品编码',
+                    sortable: true,
+                    width:400,
+                    formatter:function (value, row, index) {
+                        return $.table.tooltip(value);
+                    }
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(\'' + row.cnfName+ '\',\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+        $.table.search("formId");
+    });
+
+    /**
+     * 添加SOP配置
+     */
+    function add() {
+        var url =  $.table._option.createUrl+"?lineId="+[[${line}]];
+        $.modal.open("添加SOP配置", url,1000,600);
+    }
+
+    /**
+     * 修改产线 SOP 配置信息
+     * @param sopId SOP id
+     */
+    function edit(cnfName,id) {
+        var url =  prefix + "/editLineSop?id=" + id;
+        $.modal.open("修改" + cnfName, url,1000,600);
+    }
+
+</script>
+</body>
+</html>

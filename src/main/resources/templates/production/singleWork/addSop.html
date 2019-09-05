@@ -1,0 +1,185 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-sopLine-add">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">配置名称：</label>
+            <div class="col-sm-8">
+                <input type="text" name="cnfName" id="cnfName" class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
+            <input type="hidden" id="lineId" name="lineId" th:value="${lineId}">
+            <input type="hidden" id="wId" name="wId" th:value="${wId}">
+            <label class="col-sm-3 control-label">SOP：</label>
+            <div class="col-sm-8">
+                <select style="width: 100%" id="sopId" onchange="sopChange(this)" name="sopId" class="form-control">
+                    <option value="0">请选择</option>
+                    <option th:each="item : ${iso}" th:text="${item.cName}" th:value="${item.isoId}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">产品编码：</label>
+            <div class="col-sm-8">
+                <select style="width: 100%" id="pnId" multiple="multiple" class="form-control" name="pnId">
+                    <option th:each="item : ${pns}" th:text="${item.productCode}" th:value="${item.id}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">选择作业指导书：</label>
+            <div class="col-sm-8">
+                <select id="pageId" style="width: 100%" name="pageId" class="form-control">
+                    <option value="0">请选择</option>
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+    $(function () {
+        $("#pnId").select2({
+            placeholder: '请选择'
+        });
+        $("#sopId").select2({
+            width: '100%'
+        });
+        $("#pageId").select2({
+            width: '100%'
+        });
+    });
+    var prefix = ctx + "iso/sopLine";
+    $("#form-sopLine-add").validate({
+        rules:{
+            cnfName:{
+                required:true,
+                remote: {
+                    url: ctx + "iso/sop/checkCnfNameUnique",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        name : function() {
+                            return $.common.trim($("#cnfName").val());
+                        },
+                    },
+                    dataFilter: function(data, type) {
+                        return $.validate.unique(data);
+                    }
+                }
+            }
+        },
+        messages:{
+            cnfName:{
+                required:"配置名称必填",
+                remote:"配置名称已存在",
+            }
+        }
+    });
+    /**
+     * 保存配置
+     */
+    function submitHandler() {
+        if ($.validate.form()) {
+            //先验证书
+            var sopId = $("#sopId").find("option:selected").val();
+            if (sopId <= 0) {
+                $.modal.alertWarning("请选择SOP");
+                return;
+            }
+            //验证产品编码
+            var pnSelect = $("#pnId").find("option:selected");
+            if ($(pnSelect).size() <= 0) {
+                $.modal.alertWarning("请选择产品编码");
+                return;
+            }
+            var pageId = $("#pageId").find("option:selected").val();
+            if (pageId <= 0) {
+                $.modal.alertWarning("请选择指导书页");
+                return;
+            }
+            var pns = [];
+            for (var i = 0; i < $(pnSelect).size(); i++) {
+                pns.push($(pnSelect[i]).val())
+            }
+            // 单工位信息
+            var sopLines = [];
+            var work = {
+                lineId: [[${lineId}]],
+                sopId: sopId,
+                sopTag: 1,
+                wId: [[${wId}]],
+                pageId: pageId,
+            }
+            sopLines.push(work);
+            var data = {
+                lineId: [[${wId}]],
+                sopId: sopId,
+                cnfName: $("#cnfName").val(),
+                pnsId: pns,
+                sopTag: 1,
+                sopLines: sopLines
+            }
+            var config = {
+                url: ctx + "iso/sop/add",
+                type: "post",
+                dataType: "json",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                beforeSend: function () {
+                    $.modal.loading("正在处理中，请稍后...");
+                    $.modal.disable();
+                },
+                success: function (result) {
+                    $.operate.successCallback(result);
+                }
+            };
+            $.ajax(config)
+        }
+    }
+
+    /**
+     * sop下拉选择
+     */
+    function sopChange(val) {
+        var sopId = $(val).find("option:selected").val();
+        if (sopId > 0) {
+            $("#pageId option").remove();
+            $("#pageId select").select2({
+                data: [{id: 0, text: '请选择'}]
+            });
+            //获取对应书下的页
+            $.post("/iso/iso/findByPid", {pid: sopId}, function (res) {
+                if (res.code == 0) {
+                    var rows = [{id: 0, text: '请选择'}];
+                    var item = res.data;
+                    for (var i = 0; i < item.length; i++) {
+                        var row = {
+                            id: item[i].isoId,
+                            text: item[i].cName
+                        }
+                        rows.push(row);
+                    }
+                    $("#pageId").select2({
+                        data: rows
+                    });
+                } else {
+                    $.modal.alertWarning("操作异常...")
+                }
+            })
+        } else {
+            var data = [{id: 0, text: '请选择'}];
+            $("#pageId option").remove();
+            $("#pageId").select2({
+                data: data
+            });
+        }
+    }
+
+</script>
+</body>
+</html>
