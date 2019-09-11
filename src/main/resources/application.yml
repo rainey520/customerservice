@@ -7,16 +7,16 @@ ruoyi:
   # 版权年份
   copyrightYear: 2019
   # 文件上传路径
-  profile: D:/profile/
-#  profile: /home/file/
+#  profile: D:/profile/
+  profile: /home/file/
   # 获取ip地址开关
   addressEnabled: true
 
 # 开发环境配置
 server:
   # 服务端口
-#  port: 8084
-  port: 8081
+  port: 8084
+#  port: 8081
   servlet:
     # 项目contextPath
     context-path: /
@@ -136,18 +136,18 @@ gen:
   tablePrefix: tab_
 
 page:
-  url: http://172.16.30.55:8081/t/
-#  url: http://39.104.109.40:8084/t/
+#  url: http://172.16.30.55:8081/t/
+  url: http://39.104.109.40:8084/t/
 
 img:
-  url: http://172.16.30.55:8081/profile/avatar/
-#  url: http://39.104.109.40:8084/profile/avatar/
+#  url: http://172.16.30.55:8081/profile/avatar/
+  url: http://39.104.109.40:8084/profile/avatar/
 
 file:
-  url: http://172.16.30.55:8081/profile/upload/
-  iso: http://172.16.30.55:8081/profile/
-#  url: http://39.104.109.40:8084/profile/upload/
-#  iso: http://39.104.109.40:8084/profile/
+#  url: http://172.16.30.55:8081/profile/upload/
+#  iso: http://172.16.30.55:8081/profile/
+  url: http://39.104.109.40:8084/profile/upload/
+  iso: http://39.104.109.40:8084/profile/
 
 baidu:
   appId: 16721729

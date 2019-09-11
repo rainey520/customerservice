@@ -69,9 +69,9 @@ public class AfterServiceServiceImpl implements IAfterServiceService
 				// 搜索条件
 				serviceItem.setSearchItem(searchItem);
 				// 查询录入该条件的所有人的信息
-				serviceItem.setUserNames(afterServiceMapper.selectListBySearchInfoUserName(searchItem));
+				serviceItem.setUserNames(afterServiceMapper.selectListBySearchInfoUserName(searchItem,afterService.getParams()));
 				// 查询总共的记录数
-				item = afterServiceMapper.selectListByBatchInfo(searchItem);
+				item = afterServiceMapper.selectListByBatchInfo(searchItem,afterService.getParams());
 				if (StringUtils.isNotNull(item)) {
 					serviceItem.setTotalNum(item.getTotalNum());
 					serviceItem.setsTime(item.getsTime());

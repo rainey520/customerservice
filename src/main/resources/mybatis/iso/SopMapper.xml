@@ -163,7 +163,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <delete id="deleteSop">
          delete from tab_sop where company_id = #{companyId}
         <if test="lineId != null">and line_id = #{lineId}</if>
-        <if test="lineId != null">and sop_tag = #{sopTag}</if>
+        <if test="sopTag != null">and sop_tag = #{sopTag}</if>
     </delete>
     
 </mapper>

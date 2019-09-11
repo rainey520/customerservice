@@ -76,12 +76,12 @@ public interface AfterServiceMapper
 	 * @param searchItem 搜索条件
 	 * @return 结果
 	 */
-	String selectListBySearchInfoUserName(@Param("searchItem") String searchItem);
+	String selectListBySearchInfoUserName(@Param("searchItem") String searchItem, @Param("params") Map<String, Object> params);
 
 	/**
 	 * 通过搜索条件的查询列表
 	 * @param searchItem 搜索条件
 	 * @return 结果
 	 */
-	AfterServiceItem selectListByBatchInfo(@Param("searchItem") String searchItem);
+	AfterServiceItem selectListByBatchInfo(@Param("searchItem") String searchItem, @Param("params") Map<String, Object> params);
 }

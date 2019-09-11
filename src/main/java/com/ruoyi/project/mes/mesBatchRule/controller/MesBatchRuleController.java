@@ -228,7 +228,6 @@ public class MesBatchRuleController extends BaseController
 	@ResponseBody
 	public AjaxResult appSelectList(@RequestBody MesBatchRule mesBatchRule){
 		try {
-			System.out.println("_________________");
 			return AjaxResult.success("请求成功",mesBatchRuleService.selectMesBatchRuleList(mesBatchRule));
 		} catch (Exception e) {
 			return error("请求失败");
