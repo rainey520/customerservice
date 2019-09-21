@@ -9,7 +9,8 @@ import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
-import com.ruoyi.project.iso.sopLine.domain.SopLine;
+import com.ruoyi.project.iso.sop.domain.Sop;
+import com.ruoyi.project.iso.sop.service.ISopService;
 import com.ruoyi.project.iso.sopLine.service.ISopLineService;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.service.IDevWorkOrderService;
@@ -236,6 +237,9 @@ public class ProductionLineController extends BaseController {
     @Autowired
     private IDevWorkOrderService workOrderService;
 
+    @Autowired
+    private ISopService sopService;
+
     /**
      * app端查询流水线信息
      */
@@ -277,9 +281,9 @@ public class ProductionLineController extends BaseController {
      */
     @PostMapping("/appLineCfSopList")
     @ResponseBody
-    public AjaxResult appSelectLintCfSopList(@RequestBody SopLine sopLine) {
+    public AjaxResult appSelectLintCfSopList(@RequestBody Sop sop) {
         try {
-            return AjaxResult.success("请求成功", sopLineService.selectSopLineList(sopLine));
+            return AjaxResult.success("请求成功",sopService.selectSopList(sop));
         } catch (Exception e) {
             return error("请求失败");
         }

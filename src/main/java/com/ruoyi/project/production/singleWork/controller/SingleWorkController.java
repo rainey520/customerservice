@@ -11,7 +11,6 @@ import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.iso.iso.service.IIsoService;
-import com.ruoyi.project.iso.sopLine.domain.SopLine;
 import com.ruoyi.project.iso.sopLine.service.ISopLineService;
 import com.ruoyi.project.product.list.service.IDevProductListService;
 import com.ruoyi.project.production.singleWork.domain.SingleWork;
@@ -296,26 +295,6 @@ public class SingleWorkController extends BaseController {
                 }
                 map.put("singWorkList", singleWorkService.appSelectSingleWorkList(singleWork));
                 return AjaxResult.success("请求成功", map);
-            }
-            return error();
-        } catch (Exception e) {
-            return error("请求失败");
-        }
-    }
-
-    /**
-     * app端单工位查询sop配置列表
-     *
-     * @param lineId 单工位id
-     * @param sopTag sop标记
-     */
-    @PostMapping("/appSingWorkCfSopList")
-    @ResponseBody
-    public AjaxResult appSingWorkCfSopList(@RequestBody SopLine sopLine) {
-        try {
-            if (sopLine != null) {
-                sopLine.appStartPage();
-                return AjaxResult.success("请求成功", sopLineService.selectSopLineList2(sopLine));
             }
             return error();
         } catch (Exception e) {

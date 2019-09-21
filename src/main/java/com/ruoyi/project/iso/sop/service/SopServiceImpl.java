@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -57,7 +58,11 @@ public class SopServiceImpl implements ISopService
 	@Override
 	public List<Sop> selectSopList(Sop sop)
 	{
-	    return sopMapper.selectSopList(sop);
+		User user = JwtUtil.getUser();
+		if (user == null) {
+		    return Collections.emptyList();
+		}
+		return sopMapper.selectSopList(sop);
 	}
 
 	/**

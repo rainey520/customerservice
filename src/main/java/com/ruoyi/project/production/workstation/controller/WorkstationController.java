@@ -176,7 +176,6 @@ public class WorkstationController extends BaseController
 	@ResponseBody
 	public AjaxResult appEdit(@RequestBody Workstation workstation){
 		try {
-
 			return toAjax(workstationService.appUpdateWorkstation(workstation));
 		}catch (BusinessException e){
 			LOGGER.error("APP端工位配置硬件出现异常：" + e.getMessage());

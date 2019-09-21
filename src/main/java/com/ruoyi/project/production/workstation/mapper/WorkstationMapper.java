@@ -68,6 +68,14 @@ public interface WorkstationMapper
      * @return 结果
      */
 	public int updateWorkstation(Workstation workstation);
+
+	/**
+	 * app修改工位配置
+	 *
+	 * @param workstation 工位配置信息
+	 * @return 结果
+	 */
+	public int updateWorkstation1(Workstation workstation);
 	
 	/**
      * 删除工位配置

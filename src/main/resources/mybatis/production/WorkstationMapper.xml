@@ -107,6 +107,28 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </update>
 
+    <!--app修改工位硬件配置-->
+    <update id="updateWorkstation1" parameterType="Workstation">
+        update tab_workstation
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="lineId != null  ">line_id = #{lineId},</if>
+            <if test="wName != null  and wName != ''  ">w_name = #{wName},</if>
+            <if test="sopId != null  ">sop_id = #{sopId},</if>
+            <if test="devId != null  ">dev_id = #{devId},</if>
+            <if test="devCode != null and devCode != '' ">dev_code = #{devCode},</if>
+            <if test="cId != null  ">c_id = #{cId},</if>
+            <if test="cCode != null and cCode != '' ">c_code = #{cCode},</if>
+            <if test="eId != null  ">e_id = #{eId},</if>
+            <if test="eCode != null and eCode != '' ">e_code = #{eCode},</if>
+            <if test="sign != null  ">sign = #{sign},</if>
+            <if test="cTime != null  ">c_time = #{cTime},</if>
+            <if test="defId != null  ">def_id = #{defId},</if>
+            <if test="jpushTag != null  ">jpush_tag = #{jpushTag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
 	<delete id="deleteWorkstationById" parameterType="Integer">
         delete from tab_workstation where id = #{id}
     </delete>

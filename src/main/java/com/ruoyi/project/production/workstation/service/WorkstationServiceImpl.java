@@ -341,13 +341,6 @@ public class WorkstationServiceImpl implements IWorkstationService {
                 devListMapper.updateDevSign(devList);
                 workstation.setDevId(devList.getId());
             }
-        } else {
-            if (work.getDevId() > 0) {
-                // 还原之前硬件为未使用
-                devListMapper.updateDevSignAndType(user.getCompanyId(), work.getDevId(), DevConstants.DEV_SIGN_NOT_USE, null);
-                workstation.setDevId(0);
-                workstation.setDevCode(null);
-            }
         }
 
         // 看板硬件
@@ -373,15 +366,8 @@ public class WorkstationServiceImpl implements IWorkstationService {
                 devListMapper.updateDevSign(devList);
                 workstation.setcId(devList.getId());
             }
-        } else {
-            if (work.getcId() > 0) {
-                // 还原之前硬件为未使用
-                devListMapper.updateDevSignAndType(user.getCompanyId(), work.getcId(), DevConstants.DEV_SIGN_NOT_USE, null);
-                workstation.setcId(0);
-                workstation.setcCode(null);
-            }
         }
-        int row = workstationMapper.updateWorkstation(workstation);
+        int row = workstationMapper.updateWorkstation1(workstation);
         //更新流水线手动或者自动
         updateLineManual(work);
         return row;
